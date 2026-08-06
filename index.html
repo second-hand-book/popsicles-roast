@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>POPSICLE ROAST</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    body {
+      background-color: #ffffff; /* 純白背景 */
+      color: #111111;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      overflow: hidden;
+    }
+
+    header {
+      text-align: center;
+      padding-top: 3rem;
+    }
+
+    header h1 {
+      font-size: 3.8rem; /* 很大的質感英文標題 */
+      letter-spacing: 12px; /* 拉開字距營造極簡高級感 */
+      font-weight: 800;
+      color: #111111;
+      text-transform: uppercase;
+      line-height: 1;
+    }
+
+    /* 3D 環形舞台 */
+    .stage {
+      width: 100%;
+      height: 380px;
+      perspective: 1000px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: grab;
+    }
+
+    .stage:active {
+      cursor: grabbing;
+    }
+
+    .carousel {
+      width: 225px; /* 4:3 比例 (直式 225px * 300px) */
+      height: 300px;
+      position: relative;
+      transform-style: preserve-3d;
+    }
+
+    .card {
+      position: absolute;
+      width: 225px;
+      height: 300px;
+      border-radius: 0; /* 完全無倒角 */
+      overflow: hidden;
+      background: #ffffff;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08); /* 柔和立體陰影 */
+      transition: opacity 0.3s, transform 0.3s;
+      opacity: 0.4; /* 非聚焦卡片半透明 */
+    }
+
+    .card img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain; /* 4:3 完整顯示照片，不裁切 */
+      pointer-events: none;
+      background-color: #fafafa;
+    }
+
+    /* 正中央聚焦狀態 */
+    .card.active {
+      opacity: 1;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+    }
+
+    /* 銳評區域 */
+    .review-panel {
+      width: 90%;
+      max-width: 500px;
+      padding: 1rem 1rem 3.5rem 1rem;
+      text-align: center;
+      min-height: 150px;
+    }
+
+    .ice-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #111111;
+      margin-bottom: 0.6rem;
+      letter-spacing: 1px;
+    }
+
+    .rating {
+      font-size: 1.1rem;
+      color: #111111; /* 評分黑色 */
+      font-weight: 600;
+      margin-bottom: 0.8rem;
+      letter-spacing: 2px;
+    }
+
+    .review-text {
+      color: #333333; /* 評語黑色 */
+      font-size: 0.95rem;
+      line-height: 1.6;
+      font-weight: 400;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>POPSICLE ROAST</h1>
+  </header>
+
+  <!-- 3D 環形轉盤舞台 -->
+  <div class="stage" id="stage">
+    <div class="carousel" id="carousel"></div>
+  </div>
+
+  <!-- 下方銳評區域 -->
+  <div class="review-panel">
+    <div class="ice-title" id="iceTitle"></div>
+    <div class="rating" id="rating"></div>
+    <div class="review-text" id="reviewText"></div>
+  </div>
+
+  <script>
+    // 💡 圖片放置於 image/ 資料夾中，檔名從 1.jpg 開始
+    const popsicles = [
+      {
+        name: "白醋涼麵風味雪糕",
+        img: "image/1.jpg",
+        rating: "★ ★ ★ ★ ☆ (1.2 / 5.0)",
+        review: "這太鹹了…吃一整支舌頭會澀"
+      },
+      {
+        name: "開心果金絲脆摩納餅",
+        img: "image/2.jpg",
+        rating: "★ ★ ☆ ☆ ☆ (0.5 / 5.0)",
+        review: "不！！！不好吃！沒什麼開心果味 裡面也不算脆 大家不要買！"
+      },
+      {
+        name: "Baiocchi",
+        img: "image/3.jpg",
+        rating: "★ ★ ★ ★ ★ (4.8 / 5.0)",
+        review: "開心果推薦這個餅乾"
+      },
+      {
+        name: "番茄糖葫蘆冰棒",
+        img: "image/4.jpg",
+        rating: "★ ☆ ☆ ☆ ☆ (4.3 / 5.0)",
+        review: "好吃到想囤積XD"
+      },
+      {
+        name: "JULIA LIN 香菜牛奶花生雪糕",
+        img: "image/5.jpg",
+        rating: "★ ★ ★ ★ ☆ (2.3 / 5.0)",
+        review: "雅芳加新鮮香菜在冰棒裡真的有合法嗎？"
+      },
+      {
+        name: "莊記綠豆鑽冰棒",
+        img: "image/6.jpg",
+        rating: "★ ★ ★ ★ ☆ (4.3 / 5.0)",
+        review: "好吃欸"
+      }
+    ];
+
+    const carousel = document.getElementById("carousel");
+    const stage = document.getElementById("stage");
+    const iceTitleEl = document.getElementById("iceTitle");
+    const ratingEl = document.getElementById("rating");
+    const reviewTextEl = document.getElementById("reviewText");
+
+    const total = popsicles.length;
+    const angleStep = 360 / total;
+    const radius = 280; // 環形半徑
+
+    let currentAngle = 0;
+    let startX = 0;
+    let isDragging = false;
+    let velocity = 0;
+    let lastX = 0;
+    let animationFrame = null;
+
+    // 初始化卡片
+    popsicles.forEach((item, index) => {
+      const card = document.createElement("div");
+      card.className = "card";
+      
+      const cardAngle = angleStep * index;
+      card.style.transform = `rotateY(${cardAngle}deg) translateZ(${radius}px)`;
+      
+      card.innerHTML = `<img src="${item.img}" alt="${item.name}">`;
+      carousel.appendChild(card);
+    });
+
+    const cards = document.querySelectorAll(".card");
+
+    // 更新聚焦卡片與相應銳評
+    function updateActiveCard() {
+      let normalizedAngle = (-currentAngle % 360 + 360) % 360;
+      let activeIndex = Math.round(normalizedAngle / angleStep) % total;
+
+      cards.forEach((card, idx) => {
+        if (idx === activeIndex) {
+          card.classList.add("active");
+        } else {
+          card.classList.remove("active");
+        }
+      });
+
+      iceTitleEl.textContent = popsicles[activeIndex].name;
+      ratingEl.textContent = popsicles[activeIndex].rating;
+      reviewTextEl.textContent = popsicles[activeIndex].review;
+    }
+
+    function render() {
+      carousel.style.transform = `rotateY(${currentAngle}deg)`;
+      updateActiveCard();
+    }
+
+    // 拖拽與物理甩動
+    function onPointerDown(e) {
+      isDragging = true;
+      startX = e.clientX || e.touches[0].clientX;
+      lastX = startX;
+      velocity = 0;
+      cancelAnimationFrame(animationFrame);
+    }
+
+    function onPointerMove(e) {
+      if (!isDragging) return;
+      const x = e.clientX || (e.touches && e.touches[0].clientX);
+      const deltaX = x - lastX;
+      
+      currentAngle += deltaX * 0.4;
+      velocity = deltaX * 0.4;
+      lastX = x;
+
+      render();
+    }
+
+    function onPointerUp() {
+      if (!isDragging) return;
+      isDragging = false;
+      applyInertia();
+    }
+
+    function applyInertia() {
+      if (Math.abs(velocity) > 0.05) {
+        currentAngle += velocity;
+        velocity *= 0.93;
+        render();
+        animationFrame = requestAnimationFrame(applyInertia);
+      } else {
+        snapToNearest();
+      }
+    }
+
+    function snapToNearest() {
+      const targetAngle = Math.round(currentAngle / angleStep) * angleStep;
+      animateSnap(targetAngle);
+    }
+
+    function animateSnap(target) {
+      const diff = target - currentAngle;
+      if (Math.abs(diff) > 0.1) {
+        currentAngle += diff * 0.1;
+        render();
+        animationFrame = requestAnimationFrame(() => animateSnap(target));
+      } else {
+        currentAngle = target;
+        render();
+      }
+    }
+
+    // 事件綁定
+    stage.addEventListener("mousedown", onPointerDown);
+    window.addEventListener("mousemove", onPointerMove);
+    window.addEventListener("mouseup", onPointerUp);
+
+    stage.addEventListener("touchstart", onPointerDown);
+    window.addEventListener("touchmove", onPointerMove);
+    window.addEventListener("touchend", onPointerUp);
+
+    render();
+  </script>
+</body>
+</html>
