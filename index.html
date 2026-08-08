@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>POPSICLE ROAST</title>
   <style>
     * {
@@ -10,6 +10,7 @@
       margin: 0;
       padding: 0;
       user-select: none;
+      -webkit-tap-highlight-color: transparent; /* 移除手機點擊藍色陰影 */
     }
 
     body {
@@ -26,36 +27,39 @@
     .hero-section {
       width: 100%;
       min-height: 100vh;
+      min-height: 100dvh; /* 相容手機動態 Safari 網址列高度 */
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: space-between;
-      padding-bottom: 2rem;
+      padding-bottom: 1.5rem;
     }
 
     header {
       text-align: center;
-      padding-top: 3.5rem;
+      padding-top: clamp(2rem, 5vh, 3.5rem);
       width: 100%;
     }
 
     header h1 {
-      font-size: 3.8rem;
-      letter-spacing: 12px;
+      font-size: clamp(2.2rem, 8vw, 3.8rem); /* 手機端自動等比例縮小 */
+      letter-spacing: clamp(6px, 2vw, 12px);
       font-weight: 800;
       color: #111111;
       text-transform: uppercase;
       line-height: 1;
     }
 
+    /* 3D 環形舞台：防止手勢與頁面上下滾動衝突 */
     .stage {
       width: 100%;
-      height: 380px;
-      perspective: 1000px;
+      height: 320px;
+      perspective: 800px;
       display: flex;
       justify-content: center;
       align-items: center;
       cursor: grab;
+      touch-action: pan-y; /* 允許垂直滾動，但橫滑專屬於 3D 轉盤 */
     }
 
     .stage:active {
@@ -63,16 +67,16 @@
     }
 
     .carousel {
-      width: 225px;
-      height: 300px;
+      width: var(--card-w, 225px);
+      height: var(--card-h, 300px);
       position: relative;
       transform-style: preserve-3d;
     }
 
     .card {
       position: absolute;
-      width: 225px;
-      height: 300px;
+      width: var(--card-w, 225px);
+      height: var(--card-h, 300px);
       border-radius: 0;
       overflow: visible;
       background: transparent;
@@ -97,19 +101,20 @@
       filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.2));
     }
 
+    /* 銳評區域 */
     .review-panel {
       width: 90%;
       max-width: 500px;
-      padding: 1rem;
+      padding: 0.8rem 1rem;
       text-align: center;
-      min-height: 140px;
+      min-height: 130px;
     }
 
     .ice-title {
-      font-size: 1.3rem;
+      font-size: clamp(1.1rem, 4.5vw, 1.3rem);
       font-weight: 700;
       color: #111111;
-      margin-bottom: 0.6rem;
+      margin-bottom: 0.4rem;
       letter-spacing: 1px;
     }
 
@@ -118,13 +123,13 @@
       align-items: center;
       justify-content: center;
       gap: 6px;
-      margin-bottom: 0.8rem;
+      margin-bottom: 0.6rem;
     }
 
     .stars-outer {
       position: relative;
       display: inline-block;
-      font-size: 1.2rem;
+      font-size: clamp(1rem, 4vw, 1.2rem);
       letter-spacing: 3px;
       color: #e2e8f0;
       line-height: 1;
@@ -141,7 +146,7 @@
     }
 
     .score-num {
-      font-size: 1.05rem;
+      font-size: clamp(0.95rem, 3.8vw, 1.05rem);
       color: #111111;
       font-weight: 600;
       letter-spacing: 1px;
@@ -150,33 +155,34 @@
 
     .review-text {
       color: #333333;
-      font-size: 0.95rem;
-      line-height: 1.6;
+      font-size: clamp(0.88rem, 3.5vw, 0.95rem);
+      line-height: 1.5;
       font-weight: 400;
     }
 
+    /* 下滑區域：縮圖牆 */
     .gallery-section {
       width: 100%;
       max-width: 800px;
-      margin-top: 15vh;
-      padding: 0 1.5rem 6rem 1.5rem;
+      margin-top: 8vh;
+      padding: 0 1.2rem 5rem 1.2rem;
       text-align: center;
     }
 
     .gallery-title {
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       letter-spacing: 4px;
       font-weight: 700;
       color: #888888;
       text-transform: uppercase;
-      margin-bottom: 2rem;
+      margin-bottom: 1.5rem;
     }
 
     .thumbnail-gallery {
       width: 100%;
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(65px, 1fr));
-      gap: 14px;
+      grid-template-columns: repeat(auto-fill, minmax(58px, 1fr));
+      gap: 12px;
     }
 
     .thumb-card {
@@ -185,14 +191,13 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 6px;
-      background-color: transparent; /* 純透明背景 */
-      transition: transform 0.25s cubic-bezier(0.2, 0, 0, 1);
+      padding: 4px;
+      background-color: transparent;
+      transition: transform 0.2s ease;
     }
 
-    .thumb-card:hover {
-      transform: scale(1.18) translateY(-4px);
-      z-index: 10;
+    .thumb-card:active {
+      transform: scale(0.92); /* 手機觸控反饋 */
     }
 
     .thumb-card img {
@@ -200,6 +205,20 @@
       height: 100%;
       object-fit: contain;
       filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.08));
+    }
+
+    /* 針對手機小螢幕 (< 480px) 的專屬微調 */
+    @media (max-width: 480px) {
+      .stage {
+        height: 280px;
+      }
+      .gallery-section {
+        margin-top: 4vh;
+      }
+      .thumbnail-gallery {
+        grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+        gap: 10px;
+      }
     }
   </style>
 </head>
@@ -247,10 +266,9 @@
       { name: "牧場直送4.0玉米牛奶雪糕", img: "image/9.png", score: 0, review: "None" },
       { name: "丸永製菓檸檬蛋糕風味冰棒", img: "image/10.png", score: 0, review: "好吃～但蠻甜的😳 而且很小😂" },
       { name: "牧場直送4.0草莓牛奶雪糕", img: "image/11.png", score: 4.3, review: "牧場系列我覺得草莓很好吃" },
-      { name: "紫薯香草風味奶蓋雪糕", img: "image/12.png", score: 4.1, review: "香香甜甜 裡面的地瓜圓意外的加分 是軟的（牙齒友善" }
+      { name: "紫薯香草風味奶蓋雪糕", img: "image/12.png", score: 4.1, review: "香香甜甜 裡面的地瓜圓意外的加分" }
     ];
 
-    // 自動分析圖片主色調與色相 (Hue)
     function analyzeImageHue(imgUrl) {
       return new Promise((resolve) => {
         const img = new Image();
@@ -318,12 +336,10 @@
     let currentAngle = 0, startX = 0, isDragging = false, velocity = 0, lastX = 0, animationFrame = null;
 
     async function initCarousel() {
-      // 1. 自動分析並寫入 hue 值
       for (let item of popsicles) {
         item.hue = await analyzeImageHue(item.img);
       }
 
-      // 2. 依顏色色相 (Hue: 0°~360°) 完全自動由小到大排序
       popsicles.sort((a, b) => a.hue - b.hue);
 
       carousel.innerHTML = "";
@@ -331,12 +347,18 @@
       total = popsicles.length;
       angleStep = 360 / total;
 
-      const cardWidth = 225;
-      const computedRadius = Math.round((cardWidth / 2) / Math.tan(Math.PI / total)) + 20;
-      radius = Math.max(280, computedRadius);
+      // 📱 依據螢幕寬度自動選擇卡片尺寸（手機端適度縮小）
+      const isMobile = window.innerWidth <= 480;
+      const cardWidth = isMobile ? 160 : 225;
+      const cardHeight = isMobile ? 213 : 300;
+
+      document.documentElement.style.setProperty('--card-w', `${cardWidth}px`);
+      document.documentElement.style.setProperty('--card-h', `${cardHeight}px`);
+
+      const computedRadius = Math.round((cardWidth / 2) / Math.tan(Math.PI / total)) + (isMobile ? 10 : 20);
+      radius = Math.max(isMobile ? 200 : 280, computedRadius);
 
       popsicles.forEach((item, index) => {
-        // 渲染 3D 轉盤卡片
         const card = document.createElement("div");
         card.className = "card";
         const cardAngle = angleStep * index;
@@ -344,7 +366,6 @@
         card.innerHTML = `<img src="${item.img}" alt="${item.name}">`;
         carousel.appendChild(card);
 
-        // 渲染縮圖牆 (背景保持全透明)
         const thumb = document.createElement("div");
         thumb.className = "thumb-card";
         thumb.innerHTML = `<img src="${item.img}" alt="${item.name}">`;
@@ -390,7 +411,7 @@
 
     function onPointerDown(e) {
       isDragging = true;
-      startX = e.clientX || e.touches[0].clientX;
+      startX = e.clientX || (e.touches && e.touches[0].clientX);
       lastX = startX;
       velocity = 0;
       cancelAnimationFrame(animationFrame);
@@ -400,8 +421,8 @@
       if (!isDragging) return;
       const x = e.clientX || (e.touches && e.touches[0].clientX);
       const deltaX = x - lastX;
-      currentAngle += deltaX * 0.3;
-      velocity = deltaX * 0.3;
+      currentAngle += deltaX * 0.35;
+      velocity = deltaX * 0.35;
       lastX = x;
       render();
     }
@@ -440,12 +461,20 @@
       animateSnap(targetAngle);
     }
 
+    // 觸控與滑鼠事件處理
     stage.addEventListener("mousedown", onPointerDown);
     window.addEventListener("mousemove", onPointerMove);
     window.addEventListener("mouseup", onPointerUp);
-    stage.addEventListener("touchstart", onPointerDown);
-    window.addEventListener("touchmove", onPointerMove);
+
+    stage.addEventListener("touchstart", onPointerDown, { passive: true });
+    window.addEventListener("touchmove", onPointerMove, { passive: true });
     window.addEventListener("touchend", onPointerUp);
+
+    // 螢幕旋轉/調整尺寸時重新適應
+    window.addEventListener("resize", () => {
+      clearTimeout(window.resizeTimer);
+      window.resizeTimer = setTimeout(initCarousel, 250);
+    });
 
     initCarousel();
   </script>
