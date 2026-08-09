@@ -13,6 +13,14 @@
       -webkit-tap-highlight-color: transparent;
     }
 
+    /* 🔒 全域鎖死橫向滑動 */
+    html, body {
+      width: 100%;
+      max-width: 100%;
+      overflow-x: hidden !important;
+      position: relative;
+    }
+
     body {
       background-color: #ffffff;
       color: #111111;
@@ -21,17 +29,18 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      overflow-x: hidden;
     }
 
-    /* 首頁區域：作為絕對定位參考點 */
+    /* 首頁區域：作為絕對定位參考點，並裁切 3D 溢出物件 */
     .hero-section {
       width: 100%;
+      max-width: 100vw;
       min-height: 100vh;
-      position: relative; /* 關鍵：讓評語欄可以固定定位 */
+      position: relative;
       display: flex;
       flex-direction: column;
       align-items: center;
+      overflow: hidden; /* 🔒 裁切 3D 旋轉時超出左右邊界的卡片 */
     }
 
     header {
@@ -49,11 +58,11 @@
       line-height: 1;
     }
 
-    /* 🔴 紅色旋轉舞台：再加大 margin-top */
+    /* 🔴 紅色旋轉舞台 */
     .stage {
       width: 100%;
       height: 320px;
-      margin-top: 7.5rem; /* 已調整為 7.5rem */
+      margin-top: 7.5rem;
       perspective: 1000px;
       display: flex;
       justify-content: center;
@@ -103,8 +112,8 @@
 
     /* 🔵 藍色評語欄：固定位置不浮動 */
     .review-panel {
-      position: absolute; /* 鎖定定位 */
-      bottom: 2.5rem;     /* 固定死在距離底部 2.5rem 的地方 */
+      position: absolute;
+      bottom: 2.5rem;
       width: 90%;
       max-width: 500px;
       padding: 1rem;
@@ -168,6 +177,7 @@
       margin-top: 15vh;
       padding: 0 1.5rem 6rem 1.5rem;
       text-align: center;
+      overflow: hidden; /* 🔒 同步鎖死展覽區邊界 */
     }
 
     .gallery-title {
@@ -226,7 +236,7 @@
 
       .stage {
         height: 280px;
-        margin-top: 6.5rem; /* 手機版同步加大間距 */
+        margin-top: 4.5rem;
         perspective: 800px;
       }
 
