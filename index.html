@@ -10,7 +10,7 @@
       margin: 0;
       padding: 0;
       user-select: none;
-      -webkit-tap-highlight-color: transparent; /* 移除手機點擊藍色陰影 */
+      -webkit-tap-highlight-color: transparent;
     }
 
     body {
@@ -24,42 +24,42 @@
       overflow-x: hidden;
     }
 
+    /* 首頁區域：作為絕對定位參考點 */
     .hero-section {
       width: 100%;
       min-height: 100vh;
-      min-height: 100dvh; /* 相容手機動態 Safari 網址列高度 */
+      position: relative; /* 關鍵：讓評語欄可以固定定位 */
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: space-between;
-      padding-bottom: 1.5rem;
     }
 
     header {
       text-align: center;
-      padding-top: clamp(2rem, 5vh, 3.5rem);
+      padding-top: 3.5rem;
       width: 100%;
     }
 
     header h1 {
-      font-size: clamp(2.2rem, 8vw, 3.8rem); /* 手機端自動等比例縮小 */
-      letter-spacing: clamp(6px, 2vw, 12px);
+      font-size: 3.8rem;
+      letter-spacing: 12px;
       font-weight: 800;
       color: #111111;
       text-transform: uppercase;
       line-height: 1;
     }
 
-    /* 3D 環形舞台：防止手勢與頁面上下滾動衝突 */
+    /* 🔴 紅色旋轉舞台：再加大 margin-top */
     .stage {
       width: 100%;
       height: 320px;
-      perspective: 800px;
+      margin-top: 7.5rem; /* 已調整為 7.5rem */
+      perspective: 1000px;
       display: flex;
       justify-content: center;
       align-items: center;
       cursor: grab;
-      touch-action: pan-y; /* 允許垂直滾動，但橫滑專屬於 3D 轉盤 */
+      touch-action: pan-y;
     }
 
     .stage:active {
@@ -67,16 +67,16 @@
     }
 
     .carousel {
-      width: var(--card-w, 225px);
-      height: var(--card-h, 300px);
+      width: var(--card-w, 190px);
+      height: var(--card-h, 253px);
       position: relative;
       transform-style: preserve-3d;
     }
 
     .card {
       position: absolute;
-      width: var(--card-w, 225px);
-      height: var(--card-h, 300px);
+      width: var(--card-w, 190px);
+      height: var(--card-h, 253px);
       border-radius: 0;
       overflow: visible;
       background: transparent;
@@ -101,20 +101,22 @@
       filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.2));
     }
 
-    /* 銳評區域 */
+    /* 🔵 藍色評語欄：固定位置不浮動 */
     .review-panel {
+      position: absolute; /* 鎖定定位 */
+      bottom: 2.5rem;     /* 固定死在距離底部 2.5rem 的地方 */
       width: 90%;
       max-width: 500px;
-      padding: 0.8rem 1rem;
+      padding: 1rem;
       text-align: center;
-      min-height: 130px;
+      min-height: 120px;
     }
 
     .ice-title {
-      font-size: clamp(1.1rem, 4.5vw, 1.3rem);
+      font-size: 1.3rem;
       font-weight: 700;
       color: #111111;
-      margin-bottom: 0.4rem;
+      margin-bottom: 0.6rem;
       letter-spacing: 1px;
     }
 
@@ -123,13 +125,13 @@
       align-items: center;
       justify-content: center;
       gap: 6px;
-      margin-bottom: 0.6rem;
+      margin-bottom: 0.8rem;
     }
 
     .stars-outer {
       position: relative;
       display: inline-block;
-      font-size: clamp(1rem, 4vw, 1.2rem);
+      font-size: 1.2rem;
       letter-spacing: 3px;
       color: #e2e8f0;
       line-height: 1;
@@ -146,7 +148,7 @@
     }
 
     .score-num {
-      font-size: clamp(0.95rem, 3.8vw, 1.05rem);
+      font-size: 1.05rem;
       color: #111111;
       font-weight: 600;
       letter-spacing: 1px;
@@ -155,34 +157,33 @@
 
     .review-text {
       color: #333333;
-      font-size: clamp(0.88rem, 3.5vw, 0.95rem);
-      line-height: 1.5;
+      font-size: 0.95rem;
+      line-height: 1.6;
       font-weight: 400;
     }
 
-    /* 下滑區域：縮圖牆 */
     .gallery-section {
       width: 100%;
       max-width: 800px;
-      margin-top: 8vh;
-      padding: 0 1.2rem 5rem 1.2rem;
+      margin-top: 15vh;
+      padding: 0 1.5rem 6rem 1.5rem;
       text-align: center;
     }
 
     .gallery-title {
-      font-size: 0.85rem;
+      font-size: 0.9rem;
       letter-spacing: 4px;
       font-weight: 700;
       color: #888888;
       text-transform: uppercase;
-      margin-bottom: 1.5rem;
+      margin-bottom: 2rem;
     }
 
     .thumbnail-gallery {
       width: 100%;
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(58px, 1fr));
-      gap: 12px;
+      grid-template-columns: repeat(auto-fill, minmax(65px, 1fr));
+      gap: 14px;
     }
 
     .thumb-card {
@@ -191,13 +192,14 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 4px;
+      padding: 6px;
       background-color: transparent;
-      transition: transform 0.2s ease;
+      transition: transform 0.25s cubic-bezier(0.2, 0, 0, 1);
     }
 
-    .thumb-card:active {
-      transform: scale(0.92); /* 手機觸控反饋 */
+    .thumb-card:hover {
+      transform: scale(1.18) translateY(-4px);
+      z-index: 10;
     }
 
     .thumb-card img {
@@ -207,17 +209,71 @@
       filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.08));
     }
 
-    /* 針對手機小螢幕 (< 480px) 的專屬微調 */
-    @media (max-width: 480px) {
+    /* 📱 手機微調 */
+    @media (max-width: 768px) {
+      .hero-section {
+        min-height: 100dvh;
+      }
+
+      header {
+        padding-top: clamp(2rem, 5vh, 3.5rem);
+      }
+
+      header h1 {
+        font-size: clamp(2.2rem, 8vw, 3.8rem);
+        letter-spacing: clamp(6px, 2vw, 12px);
+      }
+
       .stage {
         height: 280px;
+        margin-top: 6.5rem; /* 手機版同步加大間距 */
+        perspective: 800px;
       }
+
+      .review-panel {
+        bottom: 1.5rem;
+        padding: 0.8rem 1rem;
+      }
+
+      .ice-title {
+        font-size: clamp(1.1rem, 4.5vw, 1.3rem);
+        margin-bottom: 0.4rem;
+      }
+
+      .rating-container {
+        margin-bottom: 0.6rem;
+      }
+
+      .stars-outer {
+        font-size: clamp(1rem, 4vw, 1.2rem);
+      }
+
+      .score-num {
+        font-size: clamp(0.95rem, 3.8vw, 1.05rem);
+      }
+
+      .review-text {
+        font-size: clamp(0.88rem, 3.5vw, 0.95rem);
+        line-height: 1.5;
+      }
+
       .gallery-section {
         margin-top: 4vh;
+        padding: 0 1.2rem 5rem 1.2rem;
       }
+
+      .gallery-title {
+        font-size: 0.85rem;
+        margin-bottom: 1.5rem;
+      }
+
       .thumbnail-gallery {
         grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
         gap: 10px;
+      }
+
+      .thumb-card {
+        padding: 4px;
       }
     }
   </style>
@@ -268,7 +324,7 @@
       { name: "牧場直送4.0草莓牛奶雪糕", img: "image/11.png", score: 4.3, review: "牧場系列我覺得草莓很好吃" },
       { name: "紫薯香草風味奶蓋雪糕", img: "image/12.png", score: 4.1, review: "香香甜甜 裡面的地瓜圓意外的加分" },
       { name: "Binggrae起司夾心冰淇淋蛋糕", img: "image/13.png", score: 3.9, review: "是鹹鹹的起司，但又甜甜奶奶的，前三口好吃，後面有點膩，但整體來說還是蠻特別的，可淺嚐，分食感覺比較適合" },
-      { name: "紫薯香草風味奶蓋雪糕", img: "image/14.png", score: 3.8, review: "頗甜，但裡面真的會突然有巨大巧克力塊，確實頗脆。是爽冰，不怕甜人可嘗試，怕甜人小心。" }
+      { name: "Baki Crunky 脆皮巧克力雪糕", img: "image/14.png", score: 3.8, review: "頗甜，但裡面真的會突然有巨大巧克力塊，確實頗脆。是爽冰，不怕甜人可嘗試，怕甜人小心。" }
     ];
 
     function analyzeImageHue(imgUrl) {
@@ -280,17 +336,16 @@
         img.onload = () => {
           const canvas = document.createElement("canvas");
           const ctx = canvas.getContext("2d");
-          canvas.width = 40;
-          canvas.height = 40;
+          canvas.width = 30;
+          canvas.height = 30;
 
-          ctx.drawImage(img, 0, 0, 40, 40);
           try {
-            const data = ctx.getImageData(0, 0, 40, 40).data;
+            ctx.drawImage(img, 0, 0, 30, 30);
+            const data = ctx.getImageData(0, 0, 30, 30).data;
             let rSum = 0, gSum = 0, bSum = 0, count = 0;
 
             for (let i = 0; i < data.length; i += 4) {
-              const alpha = data[i + 3];
-              if (alpha > 30) {
+              if (data[i + 3] > 30) {
                 rSum += data[i];
                 gSum += data[i + 1];
                 bSum += data[i + 2];
@@ -337,28 +392,22 @@
     let total, angleStep, radius, cards;
     let currentAngle = 0, startX = 0, isDragging = false, velocity = 0, lastX = 0, animationFrame = null;
 
-    async function initCarousel() {
-      for (let item of popsicles) {
-        item.hue = await analyzeImageHue(item.img);
-      }
-
-      popsicles.sort((a, b) => a.hue - b.hue);
-
+    function renderDOM() {
       carousel.innerHTML = "";
       gallery.innerHTML = "";
       total = popsicles.length;
       angleStep = 360 / total;
 
-      // 📱 依據螢幕寬度自動選擇卡片尺寸（手機端適度縮小）
-      const isMobile = window.innerWidth <= 480;
-      const cardWidth = isMobile ? 160 : 225;
-      const cardHeight = isMobile ? 213 : 300;
+      const isMobile = window.innerWidth <= 768;
+      
+      const cardWidth = isMobile ? 160 : 190;
+      const cardHeight = isMobile ? 213 : 253;
 
       document.documentElement.style.setProperty('--card-w', `${cardWidth}px`);
       document.documentElement.style.setProperty('--card-h', `${cardHeight}px`);
 
       const computedRadius = Math.round((cardWidth / 2) / Math.tan(Math.PI / total)) + (isMobile ? 10 : 20);
-      radius = Math.max(isMobile ? 200 : 280, computedRadius);
+      radius = Math.max(isMobile ? 200 : 320, computedRadius);
 
       popsicles.forEach((item, index) => {
         const card = document.createElement("div");
@@ -388,6 +437,16 @@
 
       cards = document.querySelectorAll(".card");
       render();
+    }
+
+    async function loadColorsAndSort() {
+      const colorPromises = popsicles.map(async (item) => {
+        item.hue = await analyzeImageHue(item.img);
+      });
+      
+      await Promise.all(colorPromises);
+      popsicles.sort((a, b) => a.hue - b.hue);
+      renderDOM();
     }
 
     function updateActiveCard() {
@@ -463,7 +522,6 @@
       animateSnap(targetAngle);
     }
 
-    // 觸控與滑鼠事件處理
     stage.addEventListener("mousedown", onPointerDown);
     window.addEventListener("mousemove", onPointerMove);
     window.addEventListener("mouseup", onPointerUp);
@@ -472,13 +530,13 @@
     window.addEventListener("touchmove", onPointerMove, { passive: true });
     window.addEventListener("touchend", onPointerUp);
 
-    // 螢幕旋轉/調整尺寸時重新適應
     window.addEventListener("resize", () => {
       clearTimeout(window.resizeTimer);
-      window.resizeTimer = setTimeout(initCarousel, 250);
+      window.resizeTimer = setTimeout(renderDOM, 200);
     });
 
-    initCarousel();
+    renderDOM();
+    loadColorsAndSort();
   </script>
 </body>
 </html>
